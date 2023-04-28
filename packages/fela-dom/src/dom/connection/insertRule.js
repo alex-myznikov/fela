@@ -1,15 +1,16 @@
 import {
   generateCSSRule,
   generateCSSSupportRule,
+  generateCSSContainerRule,
   getRuleScore,
 } from 'fela-utils'
 
 export default function insertRule(
-  { selector, declaration, support, media, pseudo },
+  { selector, declaration, support, container, media, pseudo },
   renderer,
   node
 ) {
-  const nodeReference = media + support
+  const nodeReference = media + support + container
 
   try {
     const score = getRuleScore(renderer.ruleOrder, pseudo)
@@ -43,6 +44,9 @@ export default function insertRule(
     if (support.length > 0) {
       const cssSupportRule = generateCSSSupportRule(support, cssRule)
       node.sheet.insertRule(cssSupportRule, index)
+    } else if (container.length > 0) {
+      const cssContainerRule = generateCSSContainerRule(container, cssRule)
+      node.sheet.insertRule(cssContainerRule, index)
     } else {
       node.sheet.insertRule(cssRule, index)
     }

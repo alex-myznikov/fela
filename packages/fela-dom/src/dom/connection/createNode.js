@@ -9,7 +9,7 @@ export default function createNode(
   styleNodeAttributes
 ) {
   const head = targetDocument.head || {}
-  const { type, media, support } = attributes
+  const { type, media, support, container } = attributes
 
   const node = targetDocument.createElement('style')
   node.setAttribute('data-fela-type', type)
@@ -21,6 +21,10 @@ export default function createNode(
 
   if (media) {
     node.media = media
+  }
+
+  if (container) {
+    node.container = container
   }
 
   // applying custom style tag attributes

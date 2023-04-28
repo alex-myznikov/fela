@@ -3,7 +3,8 @@ export default function generateDeclarationReference(
   value,
   pseudo = '',
   media = '',
-  support = ''
+  support = '',
+  container = ''
 ) {
-  return support + media + pseudo + property + value
+  return container + support + media + pseudo + property + value
 }

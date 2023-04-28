@@ -10,6 +10,7 @@ import {
   isNestedSelector,
   isUndefinedValue,
   isSupport,
+  isContainerQuery,
   normalizeNestedProperty,
   processStyleWithPlugins,
   STATIC_TYPE,
@@ -200,7 +201,7 @@ export default function createRenderer(config = {}) {
       )
     },
 
-    _renderStyleToClassNames(style, pseudo = '', media = '', support = '') {
+    _renderStyleToClassNames(style, pseudo = '', media = '', support = '', container = '') {
       let classNames = ''
 
       for (const property in style) {
@@ -212,7 +213,8 @@ export default function createRenderer(config = {}) {
               value,
               pseudo + normalizeNestedProperty(property),
               media,
-              support
+              support,
+              container
             )
           } else if (isMediaQuery(property)) {
             const combinedMediaQuery = generateCombinedMediaQuery(
@@ -223,7 +225,8 @@ export default function createRenderer(config = {}) {
               value,
               pseudo,
               combinedMediaQuery,
-              support
+              support,
+              container
             )
           } else if (isSupport(property)) {
             const combinedSupport = generateCombinedMediaQuery(
@@ -234,7 +237,20 @@ export default function createRenderer(config = {}) {
               value,
               pseudo,
               media,
-              combinedSupport
+              combinedSupport,
+              container
+            )
+          } else if (isContainerQuery(property)) {
+            const combinedContainer = generateCombinedMediaQuery(
+              container,
+              property.slice(10).trim()
+            )
+            classNames += renderer._renderStyleToClassNames(
+              value,
+              pseudo,
+              media,
+              support,
+              combinedContainer
             )
           } else {
             console.warn(`The object key "${property}" is not a valid nested key in Fela.
@@ -247,7 +263,8 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
             value,
             pseudo,
             media,
-            support
+            support,
+            container
           )
 
           if (renderer.cacheMap) {
@@ -258,6 +275,7 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
                 pseudo,
                 media,
                 support,
+                container
               }
 
               const processed = arrayReduce(
@@ -271,7 +289,8 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
                 processed.value,
                 processed.pseudo,
                 processed.media,
-                processed.support
+                processed.support,
+                processed.container
               )
 
               if (!renderer.cache.hasOwnProperty(cacheReference)) {
@@ -281,7 +300,8 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
                   processed.value,
                   processed.pseudo,
                   processed.media,
-                  processed.support
+                  processed.support,
+                  processed.container
                 )
               }
 
@@ -298,7 +318,8 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
               value,
               pseudo,
               media,
-              support
+              support,
+              container
             )
           }
 
@@ -314,7 +335,7 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
       return classNames
     },
 
-    _renderStyleToCache(reference, property, value, pseudo, media, support) {
+    _renderStyleToCache(reference, property, value, pseudo, media, support, container) {
       // we remove undefined values to enable
       // usage of optional props without side-effects
       if (isUndefinedValue(value)) {
@@ -327,7 +348,7 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
 
       const className =
         renderer.selectorPrefix +
-        renderer.generateClassName(property, value, pseudo, media, support)
+        renderer.generateClassName(property, value, pseudo, media, support, container)
 
       const declaration = cssifyDeclaration(property, value)
       const selector = generateCSSSelector(
@@ -345,13 +366,14 @@ Check http://fela.js.org/docs/basics/Rules.html#styleobject for more information
         pseudo,
         media,
         support,
+        container,
       }
 
       renderer.cache[reference] = change
       renderer._emitChange(change)
     },
 
-    generateClassName(property, value, pseudo, media, support) {
+    generateClassName(property, value, pseudo, media, support, container) {
       return generateClassName(
         renderer.getNextRuleIdentifier,
         renderer.filterClassName

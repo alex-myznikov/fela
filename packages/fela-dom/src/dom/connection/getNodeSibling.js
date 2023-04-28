@@ -2,7 +2,7 @@ import { FONT_TYPE, STATIC_TYPE, KEYFRAME_TYPE, RULE_TYPE } from 'fela-utils'
 
 export default function getNodeSibling(
   nodes,
-  { type, media, support },
+  { type, media, support, container },
   sortMediaQuery
 ) {
   switch (type) {
@@ -11,8 +11,10 @@ export default function getNodeSibling(
     case KEYFRAME_TYPE:
       return nodes[0]
     case RULE_TYPE:
-      const mediaNodes = nodes.map((node) => node.media)
+      const mediaNodes = nodes.map((node) => node.container || node.media)
       const filteredNodes = mediaNodes.filter((m) => m.length !== 0)
+
+      media = container || media
 
       if (media) {
         const sorted = [...filteredNodes, media].sort(sortMediaQuery)
@@ -23,10 +25,14 @@ export default function getNodeSibling(
           if (insertMedia === media && support) {
             // support
             return nodes.find(
-              (el) => el.media === sorted[sorted.indexOf(media) + 2]
+              ({ container, media }) =>
+                (container || media) === sorted[sorted.indexOf(media) + 2]
             )
           }
-          return nodes.find((el) => el.media === insertMedia)
+          return nodes.find(
+            ({ container, media }) =>
+              (container || media) === insertMedia
+          )
         }
       } else {
         const sorted = filteredNodes.sort(sortMediaQuery)
@@ -38,7 +44,7 @@ export default function getNodeSibling(
           const supportNode = nodes.find(
             (el) =>
               el.getAttribute('data-fela-support') !== undefined &&
-              el.media === '' &&
+              (el.container || el.media) === '' &&
               el.getAttribute('data-fela-type') === 'RULE'
           )
 
@@ -48,7 +54,10 @@ export default function getNodeSibling(
         }
 
         if (insertMedia) {
-          return nodes.find((el) => el.media === insertMedia)
+          return nodes.find(
+            ({ container, media }) =>
+              (container || media) === insertMedia
+          )
         }
       }
   }

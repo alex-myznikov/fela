@@ -4,10 +4,12 @@ import generateCombinedMediaQuery from './generateCombinedMediaQuery'
 import generateCSSRule from './generateCSSRule'
 import generateCSSSelector from './generateCSSSelector'
 import generateCSSSupportRule from './generateCSSSupportRule'
+import generateCSSContainerRule from './generateCSSContainerRule'
 import getRuleScore from './getRuleScore'
 import isMediaQuery from './isMediaQuery'
 import isNestedSelector from './isNestedSelector'
 import isSupport from './isSupport'
+import isContainerQuery from './isContainerQuery'
 import isUndefinedValue from './isUndefinedValue'
 import isValidHTMLElement from './isValidHTMLElement'
 import normalizeNestedProperty from './normalizeNestedProperty'
@@ -30,10 +32,12 @@ export {
   generateCSSRule,
   generateCSSSelector,
   generateCSSSupportRule,
+  generateCSSContainerRule,
   getRuleScore,
   isMediaQuery,
   isNestedSelector,
   isSupport,
+  isContainerQuery,
   isUndefinedValue,
   isValidHTMLElement,
   normalizeNestedProperty,

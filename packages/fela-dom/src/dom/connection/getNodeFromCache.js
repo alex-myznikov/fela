@@ -1,8 +1,8 @@
 import queryNode from './queryNode'
 import createNode from './createNode'
 
-function getReference({ type, media = '', support = '' }) {
-  return type + media + support
+function getReference({ type, media = '', support = '', container = '' }) {
+  return type + media + support + container
 }
 
 export default function getNodeFromCache(
